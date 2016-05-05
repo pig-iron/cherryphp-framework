@@ -2,7 +2,10 @@
 class Init
 {
     private static $db = null;
+    private static $mongodb = null;
     private static $dbConfig =null;
+    private static $mongodbConfig =null;
+    private static $cacheConfig =null;
     private static $cache = null;  
     public static $Config = null;
     public static $Router = null;
@@ -22,18 +25,28 @@ class Init
         return self::$db;
     }
 
+    public static function mongodb($db=0){
+        if(empty(self::$mongodbConfig)){
+            self::$mongodbConfig=self::$Config['mongodb'][$db];
+        }
+        if(empty(self::$mongodb)){
+            self::$mongodb=\Db\MongoDB::Prepare(self::$mongodbConfig);
+        }
+        return self::$mongodb;
+    }
+    
     public static function cache($cache_type='memcache',$cache_id=0){
-        if(empty($dbConfig)){
+        if(empty($cacheConfig)){
             $cacheConfig=self::$Config[$cache_type][$cache_id];
         }
         if(empty(self::$cache)){
             switch($cache_type)
             {
                 case 'memcache':
-                return self::$cache=new Cache_McaChe($cacheConfig);
+                return self::$cache=new \Cache\Memcache($cacheConfig);
                 break;
                 case 'redis':
-                return self::$cache=new Redis($cacheConfig);
+                return self::$cache=new \Cache\Redis($cacheConfig);
                 break;
             }
         }
